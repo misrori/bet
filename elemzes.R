@@ -15,8 +15,8 @@ mol <- adat[adat$ticker=="MOL",][1:580,]
 
 df_mol <-data.frame() 
 
-for(i in 5:nrow(mol)){
-    t<- data.frame(x4=mol$valtozas1[i-4], x4a=mol$amount[i-4],x3=mol$valtozas1[i-3], x3a=mol$amount[i-3],x2=mol$valtozas1[i-2], x2a=mol$amount[i-2], x1=mol$valtozas1[i-1], x1a=mol$amount[i-1], target=mol$valtozas1[i])
+for(i in 3:nrow(mol)){
+    t<- data.frame(x4=mol$valtozas1[i-4], x4a=mol$amount[i-4],x3=mol$valtozas1[i-3], x3a=mol$amount[i-3],x2=mol$valtozas1[i-2], x2a=mol$amount[i-2], x1=mol$valtozas1[i-1], x1a=mol$amount[i-1], x=mol$valtozas1[i], xa=mol$amount[i], target=mol$valtozas1[i+1])
     df_mol <- rbind(df_mol, t)
    }
 
@@ -34,7 +34,6 @@ phat <- predict(md, df_mol[470:578,] )
 f <- data.frame(df_mol[470:578,]$target, phat)
 names(f) <- c("act", "pred")
 
-md <- randomForest(cnt ~ ., data = d_train, ntree = 200, importance = TRUE)
 varImpPlot(md)
 
 # 
