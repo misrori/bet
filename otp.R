@@ -24,34 +24,32 @@ bux<- bux[, c(1,3)]
 adat <- merge(adat, bux, by='date')
 adat <- adat[complete.cases(adat)]
 setorder(adat, ticker, date)
+adat <- adat[ticker=="OTP",]
+adat <- adat[,-2]
 
 
 train_df <-data.frame() 
 
 for(i in 4:nrow(adat)){
-    t<- data.frame(ticker=adat$ticker[i], x3=adat$valtozas1[i-3], x3a=adat$amount[i-3],x2=adat$valtozas1[i-2], x2a=adat$amount[i-2],
-                   x1=adat$valtozas1[i-1], adat=adat$amount[i-1], x3_bux=adat$bux_valt[i-3], 
-                   x2_bux=adat$bux_valt[i-2], x1_bux=adat$bux_valt[i-1], target=adat$valtozas1[i])
-    train_df <- rbind(train_df, t)
-   }
+  t<- data.frame(x3=adat$valtozas1[i-3], x3a=adat$amount[i-3],x2=adat$valtozas1[i-2], x2a=adat$amount[i-2],
+                 x1=adat$valtozas1[i-1], adat=adat$amount[i-1], x3_bux=adat$bux_valt[i-3], 
+                 x2_bux=adat$bux_valt[i-2], x1_bux=adat$bux_valt[i-1], target=adat$valtozas1[i])
+  train_df <- rbind(train_df, t)
+}
 
 
+train_df$target <- ifelse(train_df$target>1.5, 1,0)
+train_df$target <- as.factor(train_df$target)
 
-mod1 <- lm(target~.,data = train_df[,-1, with=F])
- 
-eredmyeny <- predict(mod1, train_df[570:578,] )
-
-aa<- data.frame(df_mol[570:578,]$target, eredmyeny)
-
-md <- randomForest(target ~ ., data = train_df[,-1], ntree = 500)
+md <- randomForest(target ~ ., data = train_df[1:1000,], ntree = 500)
 
 
 md
 plot(md)
-phat <- predict(md, df_mol[470:578,] )
-f <- data.frame(df_mol[470:578,]$target, phat)
+phat <- predict(md, train_df[1000:1235,] )
+f <- data.frame(train_df[1000:1235,]$target, phat)
 names(f) <- c("act", "pred")
-
+View(f)
 varImpPlot(md)
 
 d_mol_test <- adat[ti]
@@ -105,3 +103,4 @@ for(i in 4:nrow(adat)){
 # 
 # str(hasznos)
 # 
+
